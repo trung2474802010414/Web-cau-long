@@ -1,0 +1,411 @@
+/* ===================================================
+   RESET & BIẾN MÀU (CSS VARIABLES)
+   =================================================== */
+   :root {
+    --bg-body: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --live-red: #ef4444;
+    --wait-yellow: #f59e0b;
+    --done-green: #10b981;
+    --border-color: #e2e8f0;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+/* ===================================================
+   HEADER
+   =================================================== */
+header {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 24px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1e293b;
+}
+
+header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #f8fafc;
+}
+
+header p {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-reg {
+    background: var(--primary);
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.btn-reg:hover {
+    background: var(--primary-hover);
+}
+
+.live-status {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid #059669;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ===================================================
+   MAIN LAYOUT
+   =================================================== */
+main {
+    width: 86%;
+    max-width: 1200px;
+    margin: 32px auto;
+}
+
+section {
+    margin-bottom: 44px;
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===================================================
+   STATISTICS CARDS
+   =================================================== */
+.statistics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 36px;
+}
+
+.stat {
+    background: var(--card-bg);
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.stat span {
+    font-size: 2rem;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+}
+
+.stat p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat strong {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ===================================================
+   MATCH GRID & CARDS
+   =================================================== */
+.match-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.match-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease;
+}
+
+.match-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Header trận đấu */
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.match-header strong {
+    font-size: 1.05rem;
+    color: #1e293b;
+}
+
+.playing {
+    color: var(--live-red);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    animation: pulse 1.5s infinite;
+}
+
+.waiting {
+    color: var(--wait-yellow);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.finished {
+    color: var(--done-green);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* Thông tin ngày giờ, địa điểm */
+.match-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin: 8px 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* Bảng điểm & VĐV */
+.players {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.player {
+    width: 42%;
+    display: flex;
+    flex-direction: column;
+}
+
+.player p {
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    color: #334155;
+}
+
+.player strong {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+}
+
+.player:last-child {
+    text-align: right;
+}
+
+.player:last-child p {
+    justify-content: flex-end;
+}
+
+.vs {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0 10px;
+}
+
+/* Nút điều khiển nhanh */
+.controls {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.controls a {
+    text-decoration: none;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+.controls a:hover {
+    background: #e2e8f0;
+}
+
+.controls .finish {
+    background: #fee2e2;
+    color: var(--live-red);
+    margin-left: auto;
+}
+
+.controls .finish:hover {
+    background: #fecaca;
+}
+
+.controls .start {
+    background: #0f172a;
+    color: #ffffff;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+}
+
+.controls .start:hover {
+    background: #1e293b;
+}
+
+/* ===================================================
+   ANIMATION & RESPONSIVE
+   =================================================== */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+@media (max-width: 900px) {
+    .match-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    main {
+        width: 92%;
+        margin: 20px auto;
+    }
+
+    .statistics {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .player strong {
+        font-size: 1.8rem;
+    }
+}
+/* TOAST NOTIFICATION NEON GREEN */
+.neon-toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.neon-toast {
+    pointer-events: auto;
+    background: rgba(10, 25, 18, 0.95);
+    border: 1.5px solid #00ff88;
+    color: #00ff88;
+    padding: 14px 22px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.45), inset 0 0 12px rgba(0, 255, 136, 0.15);
+    backdrop-filter: blur(8px);
+    animation: slideInRight 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.5s ease 2.8s forwards;
+}
+
+.neon-toast .toast-icon {
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 6px #00ff88);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}

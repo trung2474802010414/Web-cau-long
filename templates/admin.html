@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BWF Admin - Điều Hành Giải Đấu</title>
+    <style>
+        :root {
+            --bwf-red: #e11d48;
+            --bwf-red-dark: #be123c;
+            --bwf-red-glow: rgba(225, 29, 72, 0.35);
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 24, 38, 0.95);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(225, 29, 72, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(190, 18, 60, 0.15) 0%, transparent 45%);
+            color: var(--text-light);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        /* POP-UP NEON GREEN TOAST */
+        .neon-toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .neon-toast {
+            pointer-events: auto;
+            background: rgba(10, 25, 18, 0.95);
+            border: 1.5px solid #00ff88;
+            color: #00ff88;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.45), inset 0 0 12px rgba(0, 255, 136, 0.15);
+            backdrop-filter: blur(8px);
+            animation: slideInRight 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), fadeOut 0.5s ease 2.8s forwards;
+        }
+
+        .neon-toast .toast-icon {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 0 6px #00ff88);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 26px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--bwf-red);
+        }
+
+        .header-bar h1 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--bwf-red), var(--bwf-red-dark));
+            font-weight: 800;
+            font-size: 0.88rem;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 15px var(--bwf-red-glow);
+            transition: opacity 0.2s;
+        }
+        .nav-link:hover { opacity: 0.9; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        .card h3 {
+            margin: 0 0 16px 0;
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tournament-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .create-form {
+            display: grid;
+            grid-template-columns: 140px 1.8fr 1.8fr 1.5fr auto;
+            gap: 12px;
+        }
+
+        input, select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1.5px solid rgba(255,255,255,0.12);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+        }
+        input:focus, select:focus {
+            border-color: var(--bwf-red);
+            box-shadow: 0 0 10px var(--bwf-red-glow);
+        }
+        select option {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--bwf-red), var(--bwf-red-dark));
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px var(--bwf-red-glow);
+            white-space: nowrap;
+        }
+
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        tbody tr {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .court-badge {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .team-display { font-weight: 700; line-height: 1.4; color: #fff; }
+        .vs-sep { color: var(--bwf-red); font-size: 0.75rem; }
+
+        .score-input-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .input-score {
+            width: 50px;
+            height: 38px;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #fb7185;
+            background: rgba(10, 14, 23, 0.9);
+        }
+
+        .btn-save-score {
+            background: rgba(225, 29, 72, 0.15);
+            border: 1px solid var(--bwf-red);
+            color: #fb7185;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save-score:hover {
+            background: var(--bwf-red);
+            color: #fff;
+        }
+
+        .btn-del {
+            background: rgba(225, 29, 72, 0.12);
+            color: #fb7185;
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .btn-del:hover {
+            background: var(--bwf-red);
+            color: #fff;
+        }
+
+        .btn-edit-court {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .btn-edit-court:hover { color: #fff; border-color: #fff; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-box {
+            background: #111827;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 360px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- KHỐI POP-UP NEON GREEN TOAST -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="neon-toast-container">
+                {% for message in messages %}
+                    <div class="neon-toast">
+                        <span class="toast-icon">⚡</span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="header-bar">
+        <h1>🏸 Quản Trị Giải Cầu Lông</h1>
+        <a href="{{ url_for('home') }}" target="_blank" class="nav-link">👉 Mở Bảng Điểm Live</a>
+    </div>
+
+    <!-- 1. THIẾT LẬP TÊN GIẢI & LỊCH THI ĐẤU -->
+    <div class="card" style="border-left: 4px solid var(--bwf-red);">
+        <h3>🏆 Thiết Lập Thông Tin & Thời Gian Giải Đấu</h3>
+        <form action="{{ url_for('update_tournament_info') }}" method="POST" class="tournament-form">
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">TÊN GIẢI ĐẤU:</label>
+                <input type="text" name="tournament_name" value="{{ settings.tournament_name }}" required placeholder="VD: Giải Cầu Lông Văn Lang 2026">
+            </div>
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">NGÀY KHỞI TRANH:</label>
+                <input type="date" name="start_date" value="{{ settings.start_date }}" required>
+            </div>
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">NGÀY KẾT THÚC:</label>
+                <input type="date" name="end_date" value="{{ settings.end_date }}" required>
+            </div>
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">ĐỊA ĐIỂM THI ĐẤU CỐ ĐỊNH:</label>
+                <input type="text" name="tournament_location" value="{{ settings.tournament_location }}" required placeholder="VD: Nhà thi đấu ĐH Văn Lang">
+            </div>
+            <button type="submit" class="btn-create" style="height: 42px;">Lưu Thông Tin</button>
+        </form>
+    </div>
+
+    <!-- 2. CỔNG ĐĂNG KÝ & QUẢN LÝ LỆ PHÍ -->
+    <div class="card">
+        <h3>📲 Cổng Đăng Ký & Quản Lý Lệ Phí Thi Đấu</h3>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <img src="{{ qr_url }}" alt="QR" width="80" height="80" style="background:#fff; padding:4px; border-radius:8px;">
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">Link form đăng ký cho VĐV:</div>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" value="{{ reg_link }}" readonly style="width: 260px;">
+                        <a href="{{ reg_link }}" target="_blank" style="text-decoration:none; padding:8px 12px; background:rgba(225,29,72,0.2); border:1px solid var(--bwf-red); color:#fb7185; font-weight:800; border-radius:8px; font-size:0.85rem;">Mở thử form</a>
+                    </div>
+                </div>
+            </div>
+
+            <form action="{{ url_for('update_reg_fee') }}" method="POST" style="background: rgba(15,23,42,0.8); padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <div>
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">LỆ PHÍ ĐƠN (VNĐ):</label>
+                    <input type="number" step="10000" name="fee_single" value="{{ settings.fee_single }}" required style="width: 120px; font-weight: 800; color: #fb7185; font-size: 1rem;">
+                </div>
+
+                <div>
+                    <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; display: block; margin-bottom: 4px;">LỆ PHÍ ĐÔI (VNĐ):</label>
+                    <input type="number" step="10000" name="fee_double" value="{{ settings.fee_double }}" required style="width: 120px; font-weight: 800; color: #fb7185; font-size: 1rem;">
+                </div>
+
+                <button type="submit" class="btn-create" style="margin-top: 16px; padding: 9px 15px; font-size: 0.85rem;">Cập Nhật Giá</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. TẠO TRẬN ĐẤU MỚI -->
+    <div class="card">
+        <h3>➕ Thêm Trận Đấu Mới</h3>
+        <form action="{{ url_for('create_match') }}" method="POST" class="create-form">
+            <input type="text" name="court" placeholder="Sân (VD: Sân 01)" required>
+
+            <select name="player1" required>
+                <option value="" disabled selected>-- Chọn VĐV / Đội 1 --</option>
+                {% for a in athletes if a.status == 'Đã duyệt' %}
+                    <option value="{{ a.full_name }}">{{ a.full_name }} ({{ a.category }})</option>
+                {% else %}
+                    <option value="" disabled>Chưa có VĐV nào được duyệt</option>
+                {% endfor %}
+            </select>
+
+            <select name="player2" required>
+                <option value="" disabled selected>-- Chọn VĐV / Đội 2 --</option>
+                {% for a in athletes if a.status == 'Đã duyệt' %}
+                    <option value="{{ a.full_name }}">{{ a.full_name }} ({{ a.category }})</option>
+                {% else %}
+                    <option value="" disabled>Chưa có VĐV nào được duyệt</option>
+                {% endfor %}
+            </select>
+
+            <input type="text" name="match_time" placeholder="Giờ đấu (VD: 08:30 15/09)">
+            <button type="submit" class="btn-create">Tạo Trận</button>
+        </form>
+    </div>
+
+    <!-- 4. DANH SÁCH & TỈ SỐ -->
+    <div class="card">
+        <h3>⚡ Danh Sách Trận Đấu & Cập Nhật Tỉ Số</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Sân Đấu</th>
+                        <th style="width: 280px;">Cặp Đấu</th>
+                        <th style="width: 360px;">Tỉ Số & Trạng Thái</th>
+                        <th style="width: 240px;">Lịch & Địa Điểm</th>
+                        <th style="width: 80px;">Xóa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in matches %}
+                    <tr>
+                        <td><span class="court-badge">{{ m.court }}</span></td>
+                        <td>
+                            <div class="team-display">
+                                <div>{{ m.player1 }}</div>
+                                <div class="vs-sep">VS</div>
+                                <div>{{ m.player2 }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <form action="{{ url_for('update_final_score') }}" method="POST" class="score-input-box">
+                                <input type="hidden" name="match_id" value="{{ m.id }}">
+                                <input type="text" inputmode="numeric" name="score1" class="input-score" value="{{ m.score1 }}">
+                                <span style="font-weight: 900; color: #64748b;">-</span>
+                                <input type="text" inputmode="numeric" name="score2" class="input-score" value="{{ m.score2 }}">
+
+                                <select name="status" style="font-weight: 700;">
+                                    <option value="waiting" {% if m.status == 'waiting' %}selected{% endif %}>⏳ Chờ đấu</option>
+                                    <option value="playing" {% if m.status == 'playing' %}selected{% endif %}>🔴 Đang đấu</option>
+                                    <option value="finished" {% if m.status == 'finished' %}selected{% endif %}>✅ Kết thúc</option>
+                                </select>
+                                <button type="submit" class="btn-save-score">Lưu</button>
+                            </form>
+                        </td>
+                        <td>
+                            <div style="font-size:0.85rem; color:var(--text-muted);">
+                                <div>🕒 {{ m.match_time if m.match_time else 'Chưa định' }}</div>
+                                <div>📍 {{ m.location if m.location else 'Nhà thi đấu' }}</div>
+                                <button type="button" class="btn-edit-court" onclick="openModal('{{ m.id }}', '{{ m.court }}', '{{ m.match_time }}', '{{ m.location }}')">✏️ Sửa</button>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn-del" data-url="{{ url_for('delete_match', match_id=m.id) }}" onclick="confirmDelete(this.dataset.url)">Xóa</button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" style="padding: 24px; color: var(--text-muted);">Hiện chưa có trận đấu nào được tạo.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 5. DANH SÁCH VĐV -->
+    <div class="card">
+        <h3>👥 Vận Động Viên Đăng Ký ({{ athletes|length }})</h3>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Họ Tên / Cặp Đôi</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Nội Dung</th>
+                        <th>Trạng Thái</th>
+                        <th>Lưu</th>
+                        <th>Xóa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in athletes %}
+                    <tr>
+                        <form action="{{ url_for('update_athlete') }}" method="POST">
+                            <input type="hidden" name="athlete_id" value="{{ a.id }}">
+                            <td>#{{ a.id }}</td>
+                            <td><strong style="color: #fff;">{{ a.full_name }}</strong></td>
+                            <td>{{ a.phone }}</td>
+                            <td><input type="text" name="category" value="{{ a.category }}" style="width: 140px;"></td>
+                            <td>
+                                <select name="status">
+                                    <option value="Chờ duyệt" {% if a.status == 'Chờ duyệt' %}selected{% endif %}>Chờ duyệt</option>
+                                    <option value="Đã duyệt" {% if a.status == 'Đã duyệt' %}selected{% endif %}>Đã duyệt</option>
+                                    <option value="Từ chối" {% if a.status == 'Từ chối' %}selected{% endif %}>Từ chối</option>
+                                </select>
+                            </td>
+                            <td><button type="submit" class="btn-save-score">Lưu</button></td>
+                            <td>
+                                <button type="button" class="btn-del" data-url="{{ url_for('delete_athlete', athlete_id=a.id) }}" onclick="confirmDelete(this.dataset.url)">Xóa</button>
+                            </td>
+                        </form>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" style="padding: 20px; color: var(--text-muted);">Chưa có VĐV nào đăng ký.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA LỊCH -->
+    <div id="editModal" class="modal">
+        <div class="modal-box">
+            <h3 style="margin-top:0; color:#fff;">Cập Nhật Thông Tin Trận</h3>
+            <form action="{{ url_for('update_match_info') }}" method="POST" style="display:flex; flex-direction:column; gap:12px;">
+                <input type="hidden" name="match_id" id="modal_match_id">
+                <div>
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Tên Sân:</label>
+                    <input type="text" name="court" id="modal_court" required style="width:100%;">
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Giờ thi đấu:</label>
+                    <input type="text" name="match_time" id="modal_match_time" style="width:100%;">
+                </div>
+                <div>
+                    <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Địa điểm:</label>
+                    <input type="text" name="location" id="modal_location" style="width:100%;">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                    <button type="button" onclick="closeModal()" style="padding:8px 14px; background:#334155; border:none; color:#fff; border-radius:6px; cursor:pointer;">Hủy</button>
+                    <button type="submit" class="btn-create" style="padding:8px 16px;">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN XÓA -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-box" style="text-align:center;">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">🗑️</div>
+            <h4 style="margin: 0 0 8px 0; color:#fff; font-size:1.15rem;">Xác nhận xóa?</h4>
+            <p style="margin: 0 0 16px 0; color:var(--text-muted); font-size:0.85rem;">Hành động này không thể hoàn tác.</p>
+            
+            <label style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:0.8rem; color:var(--text-muted); margin-bottom:18px; cursor:pointer;">
+                <input type="checkbox" id="dontAskDelete">
+                <span>Không hiển thị lại thông báo này</span>
+            </label>
+
+            <div style="display:flex; gap:10px;">
+                <button type="button" onclick="closeDeleteModal()" style="flex:1; padding:10px; background:#334155; border:none; color:#fff; border-radius:6px; cursor:pointer;">Hủy</button>
+                <button type="button" id="btnConfirmDeleteAction" class="btn-del" style="flex:1; padding:10px; font-size:0.9rem;">Xóa luôn</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, court, time, loc) {
+            document.getElementById('modal_match_id').value = id;
+            document.getElementById('modal_court').value = court;
+            document.getElementById('modal_match_time').value = time;
+            document.getElementById('modal_location').value = loc;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        let currentDeleteUrl = "";
+        function confirmDelete(deleteUrl) {
+            if (localStorage.getItem("skipDeleteConfirm") === "true") {
+                window.location.href = deleteUrl;
+                return;
+            }
+            currentDeleteUrl = deleteUrl;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentDeleteUrl = "";
+        }
+
+        document.getElementById('btnConfirmDeleteAction').addEventListener('click', function() {
+            if (document.getElementById('dontAskDelete').checked) {
+                localStorage.setItem("skipDeleteConfirm", "true");
+            }
+            if (currentDeleteUrl) {
+                window.location.href = currentDeleteUrl;
+            }
+        });
+
+        // Tự gỡ bỏ Toast khỏi DOM sau 3.3s
+        setTimeout(() => {
+            const container = document.querySelector('.neon-toast-container');
+            if (container) container.remove();
+        }, 3300);
+    </script>
+</body>
+</html>

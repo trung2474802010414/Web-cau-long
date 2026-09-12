@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ settings.tournament_name }} - BWF LiveScore</title>
+    <style>
+        :root {
+            --bwf-red: #e11d48;
+            --bwf-red-dark: #be123c;
+            --bwf-red-glow: rgba(225, 29, 72, 0.35);
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 24, 38, 0.92);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(225, 29, 72, 0.18) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(190, 18, 60, 0.18) 0%, transparent 45%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--bwf-red);
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .brand-title h1 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .btn-reg {
+            background: linear-gradient(135deg, var(--bwf-red), var(--bwf-red-dark));
+            color: #fff;
+            box-shadow: 0 2px 10px var(--bwf-red-glow);
+        }
+        .btn-reg:hover { transform: translateY(-1px); }
+        .btn-user {
+            background: rgba(30, 41, 59, 0.8);
+            color: #f1f5f9;
+            border-color: rgba(255,255,255,0.12);
+        }
+        .btn-admin {
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--text-muted);
+            border-color: rgba(255,255,255,0.08);
+        }
+        .live-tag {
+            background: rgba(22, 163, 74, 0.15);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            color: #4ade80;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 24px auto 0 auto;
+            padding: 0 20px;
+        }
+
+        /* BANNER GIỚI THIỆU GIẢI ĐẤU (SHOW NGÀY & ĐỊA ĐIỂM) */
+        .tournament-hero-banner {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(225, 29, 72, 0.3);
+            border-left: 6px solid var(--bwf-red);
+            border-radius: var(--radius);
+            padding: 24px 30px;
+            margin-bottom: 26px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--bwf-red-glow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .hero-left h2 {
+            font-size: 1.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.92rem;
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        .hero-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-series {
+            background: var(--bwf-red);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        /* THỐNG KÊ */
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .stat-card .icon {
+            font-size: 2rem;
+            opacity: 0.9;
+        }
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .stat-card strong {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* BỘ LỌC */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(18, 24, 38, 0.9);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 9px 18px;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            color: #fff;
+            border-color: var(--bwf-red);
+        }
+        .filter-btn.active {
+            background: var(--bwf-red);
+            border-color: var(--bwf-red);
+            color: #fff;
+            box-shadow: 0 0 15px var(--bwf-red-glow);
+        }
+
+        /* DANH SÁCH TRẬN ĐẤU */
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .match-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .match-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(225, 29, 72, 0.4);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding-bottom: 10px;
+        }
+        .court-name {
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .status-badge {
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            text-transform: uppercase;
+        }
+        .status-playing {
+            background: rgba(225, 29, 72, 0.2);
+            border: 1px solid var(--bwf-red);
+            color: #fb7185;
+            box-shadow: 0 0 10px var(--bwf-red-glow);
+        }
+        .status-waiting {
+            background: rgba(234, 179, 8, 0.15);
+            border: 1px solid rgba(234, 179, 8, 0.4);
+            color: #fde047;
+        }
+        .status-finished {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #94a3b8;
+        }
+
+        .match-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .players-scoreboard {
+            background: rgba(10, 14, 23, 0.8);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .player-block {
+            flex: 1;
+            text-align: center;
+        }
+        .player-block p {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-block strong {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+        }
+        .vs-divider {
+            color: var(--bwf-red);
+            font-weight: 900;
+            font-size: 0.85rem;
+            padding: 0 10px;
+        }
+
+        .no-match-alert {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            background: var(--card-bg);
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand-title">
+        <span style="font-size: 2rem;">🏸</span>
+        <div>
+            <h1>BWF LiveScore</h1>
+            <p style="color: var(--bwf-red); font-size: 0.78rem; font-weight: 800; text-transform: uppercase;">Official Tournament Live</p>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <a href="{{ url_for('register') }}" target="_blank" class="btn-action btn-reg">📝 Đăng ký VĐV</a>
+
+        {% if session.get('user_name') %}
+            <span style="font-size: 0.85rem; color: #cbd5e1;">Xin chào, <strong>{{ session.get('user_name') }}</strong></span>
+            <a href="{{ url_for('logout') }}" class="btn-action btn-user">Đăng xuất</a>
+        {% else %}
+            <a href="{{ url_for('guest_login') }}" class="btn-action btn-user">👤 Thành viên</a>
+        {% endif %}
+
+        {% if session.get('is_admin') %}
+            <a href="{{ url_for('admin_panel') }}" class="btn-action btn-admin">⚙️ Quản trị</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn-action btn-admin" style="color:#fb7185;">Thoát Admin</a>
+        {% else %}
+            <a href="{{ url_for('admin_login') }}" class="btn-action btn-admin">🔒 BTC Đăng nhập</a>
+        {% endif %}
+
+        <div class="live-tag">● ĐANG DIỄN RA</div>
+    </div>
+</header>
+
+<main>
+    <!-- HERO BANNER: THÔNG TIN GIẢI ĐẤU & LỊCH DIỄN RA -->
+    <div class="tournament-hero-banner">
+        <div class="hero-left">
+            <span class="badge-series">BWF WORLD TOUR SANCTIONED</span>
+            <h2>{{ settings.tournament_name }}</h2>
+            <div class="hero-meta">
+                <span>📅 <strong>Thời gian:</strong> {{ settings.start_date }} đến {{ settings.end_date }}</span>
+                <span>📍 <strong>Địa điểm:</strong> {{ settings.tournament_location }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- THỐNG KÊ -->
+    <section class="statistics">
+        <div class="stat-card">
+            <span class="icon">🏸</span>
+            <div>
+                <p>Đang thi đấu</p>
+                <strong>{{ matches|selectattr("status", "equalto", "playing")|list|length }}</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="icon">⏳</span>
+            <div>
+                <p>Đang chờ</p>
+                <strong>{{ matches|selectattr("status", "equalto", "waiting")|list|length }}</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="icon">✅</span>
+            <div>
+                <p>Hoàn thành</p>
+                <strong>{{ matches|selectattr("status", "equalto", "finished")|list|length }}</strong>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <span class="icon">📊</span>
+            <div>
+                <p>Tổng số trận</p>
+                <strong>{{ matches|length }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- BỘ LỌC & DANH SÁCH -->
+    <section>
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterMatches('all', this)">Tất cả ({{ matches|length }})</button>
+            <button class="filter-btn" onclick="filterMatches('playing', this)">🔴 Đang thi đấu ({{ matches|selectattr("status", "equalto", "playing")|list|length }})</button>
+            <button class="filter-btn" onclick="filterMatches('waiting', this)">⏳ Sắp thi đấu ({{ matches|selectattr("status", "equalto", "waiting")|list|length }})</button>
+            <button class="filter-btn" onclick="filterMatches('finished', this)">✅ Đã hoàn thành ({{ matches|selectattr("status", "equalto", "finished")|list|length }})</button>
+        </div>
+
+        <div class="match-grid" id="matchGrid">
+            {% for match in matches %}
+            <div class="match-card" data-status="{{ match['status'] }}">
+                <div class="match-header">
+                    <span class="court-name">{{ match["court"] }}</span>
+
+                    {% if match["status"] == "playing" %}
+                        <span class="status-badge status-playing">● LIVE</span>
+                    {% elif match["status"] == "waiting" %}
+                        <span class="status-badge status-waiting">CHỜ ĐẤU</span>
+                    {% else %}
+                        <span class="status-badge status-finished">KẾT THÚC</span>
+                    {% endif %}
+                </div>
+
+                <div class="match-meta">
+                    <span>🕒 {{ match["match_time"] if match["match_time"] else "Chưa có giờ" }}</span>
+                    <span>📍 {{ match["location"] if match["location"] else settings.tournament_location }}</span>
+                </div>
+
+                <div class="players-scoreboard">
+                    <div class="player-block">
+                        <p>{{ match["player1"] }}</p>
+                        <strong>{{ match["score1"] }}</strong>
+                    </div>
+
+                    <div class="vs-divider">VS</div>
+
+                    <div class="player-block">
+                        <p>{{ match["player2"] }}</p>
+                        <strong>{{ match["score2"] }}</strong>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-match-alert">
+                Hiện tại chưa có trận đấu nào trong danh sách.
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+<script>
+    function filterMatches(status, element) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+
+        const cards = document.querySelectorAll('.match-card');
+        cards.forEach(card => {
+            if (status === 'all' || card.getAttribute('data-status') === status) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

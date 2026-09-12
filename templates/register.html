@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BWF World Tour Style - Đăng Ký Vận Động Viên</title>
+    <style>
+        :root {
+            --bwf-red: #e11d48;
+            --bwf-red-dark: #be123c;
+            --bwf-red-glow: rgba(225, 29, 72, 0.35);
+            --bg-dark: #090d16;
+            --card-bg: rgba(18, 24, 38, 0.95);
+            --border-card: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-gray: #94a3b8;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(225, 29, 72, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(190, 18, 60, 0.25) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(255, 255, 255, 0.03) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255, 255, 255, 0.03) 25%, transparent 25%);
+            background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "🏸";
+            position: absolute;
+            top: 5%;
+            right: 8%;
+            font-size: 18rem;
+            opacity: 0.03;
+            transform: rotate(-25deg);
+            pointer-events: none;
+        }
+
+        .register-container {
+            position: relative;
+            background: var(--card-bg);
+            backdrop-filter: blur(14px);
+            width: 100%;
+            max-width: 500px;
+            padding: 36px 32px;
+            border-radius: 20px;
+            border: 1px solid var(--border-card);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px var(--bwf-red-glow);
+            z-index: 2;
+        }
+
+        .register-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 15%;
+            right: 15%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--bwf-red), transparent);
+            border-radius: 99px;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .badge-bwf {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--bwf-red), #9f1239);
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 99px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px var(--bwf-red-glow);
+        }
+
+        .header-title h2 {
+            font-size: 1.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+
+        .header-title p {
+            color: var(--text-gray);
+            font-size: 0.88rem;
+            margin-top: 4px;
+        }
+
+        .alert-success {
+            background: rgba(22, 163, 74, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            padding: 12px 14px;
+            border-radius: var(--radius);
+            margin-bottom: 22px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label.group-label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+        }
+
+        .sub-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            margin-top: -4px;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            color: #fff;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        input[type="text"]:focus, input[type="tel"]:focus {
+            border-color: var(--bwf-red);
+            box-shadow: 0 0 12px var(--bwf-red-glow);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .category-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .circle-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .circle-option:hover {
+            border-color: rgba(225, 29, 72, 0.5);
+            background: rgba(225, 29, 72, 0.05);
+        }
+
+        .circle-option input[type="checkbox"] {
+            display: none;
+        }
+
+        .custom-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #64748b;
+            margin-right: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .custom-circle::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 0.2s;
+        }
+
+        .circle-option input[type="checkbox"]:checked + .custom-circle {
+            border-color: var(--bwf-red);
+            background: rgba(225, 29, 72, 0.2);
+        }
+
+        .circle-option input[type="checkbox"]:checked + .custom-circle::after {
+            background: var(--bwf-red);
+        }
+
+        .circle-option.checked-active {
+            border-color: var(--bwf-red);
+            background: rgba(225, 29, 72, 0.12);
+            box-shadow: 0 0 15px rgba(225, 29, 72, 0.2);
+        }
+
+        .circle-option.disabled-option {
+            opacity: 0.35;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.05);
+            background: transparent;
+        }
+
+        .option-text {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .fee-tag {
+            color: #f43f5e;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .payment-box {
+            display: none;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1.5px dashed rgba(225, 29, 72, 0.4);
+            border-radius: 16px;
+            padding: 22px 18px;
+            text-align: center;
+            margin-top: 24px;
+            margin-bottom: 22px;
+        }
+
+        .total-amount-line {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+
+        .total-price {
+            color: #f43f5e;
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(244, 63, 94, 0.4);
+        }
+
+        .qr-img {
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 12px;
+            max-width: 180px;
+            height: auto;
+            margin: 0 auto 12px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .qr-note {
+            font-size: 0.82rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--bwf-red), var(--bwf-red-dark));
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px var(--bwf-red-glow);
+            transition: all 0.25s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(225, 29, 72, 0.5);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #f43f5e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="header-title">
+            <span class="badge-bwf">TOURNAMENT ENTRY</span>
+            <h2>ĐĂNG KÝ THI ĐẤU</h2>
+            <p>Giải Vô Địch Cầu Lông 2026</p>
+        </div>
+
+        {% if message %}
+            <div class="alert-success">{{ message }}</div>
+        {% endif %}
+
+        <form method="POST" id="regForm">
+            <div class="form-group">
+                <label class="group-label">Họ và Tên VĐV (hoặc Cặp VĐV):</label>
+                <input type="text" id="full_name" name="full_name" placeholder="VD: Nguyễn Văn A - Trần Văn B" required oninput="updatePayment()">
+            </div>
+
+            <div class="form-group">
+                <label class="group-label">Số điện thoại Zalo liên hệ:</label>
+                <input type="tel" id="phone" name="phone" placeholder="VD: 0912345678" required oninput="updatePayment()">
+            </div>
+
+            <div class="form-group">
+                <label class="group-label">Nội dung thi đấu:</label>
+                <div class="sub-desc">Chọn tối đa 2 nội dung (Đơn: {{ "{:,.0f}".format(fee_single) }}đ | Đôi: {{ "{:,.0f}".format(fee_double) }}đ)</div>
+
+                <div class="category-group">
+                    <!-- NỘI DUNG ĐƠN (áp dụng fee_single) -->
+                    <label class="circle-option">
+                        <input type="checkbox" name="category" value="Đơn Nam" data-fee="{{ fee_single }}" onchange="handleSelection(this)">
+                        <span class="custom-circle"></span>
+                        <div class="option-text">
+                            <span>Đơn Nam (MS)</span>
+                            <span class="fee-tag">{{ "{:,.0f}".format(fee_single) }}đ</span>
+                        </div>
+                    </label>
+
+                    <label class="circle-option">
+                        <input type="checkbox" name="category" value="Đơn Nữ" data-fee="{{ fee_single }}" onchange="handleSelection(this)">
+                        <span class="custom-circle"></span>
+                        <div class="option-text">
+                            <span>Đơn Nữ (WS)</span>
+                            <span class="fee-tag">{{ "{:,.0f}".format(fee_single) }}đ</span>
+                        </div>
+                    </label>
+
+                    <!-- NỘI DUNG ĐÔI (áp dụng fee_double) -->
+                    <label class="circle-option">
+                        <input type="checkbox" name="category" value="Đôi Nam" data-fee="{{ fee_double }}" onchange="handleSelection(this)">
+                        <span class="custom-circle"></span>
+                        <div class="option-text">
+                            <span>Đôi Nam (MD)</span>
+                            <span class="fee-tag">{{ "{:,.0f}".format(fee_double) }}đ</span>
+                        </div>
+                    </label>
+
+                    <label class="circle-option">
+                        <input type="checkbox" name="category" value="Đôi Nữ" data-fee="{{ fee_double }}" onchange="handleSelection(this)">
+                        <span class="custom-circle"></span>
+                        <div class="option-text">
+                            <span>Đôi Nữ (WD)</span>
+                            <span class="fee-tag">{{ "{:,.0f}".format(fee_double) }}đ</span>
+                        </div>
+                    </label>
+
+                    <label class="circle-option">
+                        <input type="checkbox" name="category" value="Đôi Nam Nữ" data-fee="{{ fee_double }}" onchange="handleSelection(this)">
+                        <span class="custom-circle"></span>
+                        <div class="option-text">
+                            <span>Đôi Nam Nữ (XD)</span>
+                            <span class="fee-tag">{{ "{:,.0f}".format(fee_double) }}đ</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="payment-box" id="paymentBox">
+                <div class="total-amount-line">
+                    Tổng lệ phí: <span class="total-price" id="totalDisplay">0đ</span>
+                </div>
+                <img id="qrPaymentImg" class="qr-img" src="" alt="Mã QR Thanh Toán">
+                <p class="qr-note">
+                    Quét mã QR bằng App Ngân hàng để hoàn tất đăng ký.<br>
+                    <strong>Nội dung CK:</strong> <span id="transferDesc" style="color: #f43f5e; font-weight: bold;"></span>
+                </p>
+            </div>
+
+            <button type="submit" class="btn-submit">Xác Nhận Đăng Ký</button>
+        </form>
+
+        <a href="{{ url_for('home') }}" class="back-link">← Quay lại Bảng Tỉ Số Trực Tiếp</a>
+    </div>
+
+    <script>
+        const BANK_ID = "MB";
+        const ACCOUNT_NO = "0987654321";
+
+        function handleSelection(checkbox) {
+            const allOptions = document.querySelectorAll('.circle-option');
+            const checkedBoxes = document.querySelectorAll('input[name="category"]:checked');
+
+            allOptions.forEach(label => {
+                const input = label.querySelector('input');
+                if (input.checked) {
+                    label.classList.add('checked-active');
+                } else {
+                    label.classList.remove('checked-active');
+                }
+            });
+
+            if (checkedBoxes.length >= 2) {
+                allOptions.forEach(label => {
+                    const input = label.querySelector('input');
+                    if (!input.checked) {
+                        input.disabled = true;
+                        label.classList.add('disabled-option');
+                    }
+                });
+            } else {
+                allOptions.forEach(label => {
+                    const input = label.querySelector('input');
+                    input.disabled = false;
+                    label.classList.remove('disabled-option');
+                });
+            }
+
+            updatePayment();
+        }
+
+        function updatePayment() {
+            const checkedBoxes = document.querySelectorAll('input[name="category"]:checked');
+            const paymentBox = document.getElementById("paymentBox");
+            const totalDisplay = document.getElementById("totalDisplay");
+            const qrImg = document.getElementById("qrPaymentImg");
+            const transferDesc = document.getElementById("transferDesc");
+
+            if (checkedBoxes.length === 0) {
+                paymentBox.style.display = "none";
+                return;
+            }
+
+            let totalAmount = 0;
+            checkedBoxes.forEach(box => {
+                totalAmount += Number(box.dataset.fee || 0);
+            });
+
+            totalDisplay.innerText = totalAmount.toLocaleString("vi-VN") + "đ";
+
+            const name = document.getElementById("full_name").value.trim() || "VDV";
+            const phone = document.getElementById("phone").value.trim() || "";
+            const safeName = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ");
+            const desc = `BWF ${safeName} ${phone}`.trim();
+
+            transferDesc.innerText = desc;
+
+            const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(desc)}&accountName=BAN%20TO%20CHUC`;
+            qrImg.src = qrUrl;
+
+            paymentBox.style.display = "block";
+        }
+
+        document.getElementById("regForm").addEventListener("submit", function(e) {
+            const checkedBoxes = document.querySelectorAll('input[name="category"]:checked');
+            if (checkedBoxes.length === 0) {
+                e.preventDefault();
+                alert("Vui lòng chọn ít nhất một nội dung thi đấu!");
+            }
+        });
+    </script>
+</body>
+</html>
