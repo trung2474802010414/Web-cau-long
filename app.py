@@ -1,4 +1,3 @@
-```python
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import random
@@ -34,6 +33,7 @@ ADMIN_PASSWORD = "123"
 
 SMTP_EMAIL = "YOUR_GMAIL@gmail.com"
 SMTP_PASSWORD = "YOUR_GMAIL_APP_PASSWORD"
+#ma OTP se ton tai trong 5p
 
 OTP_EXPIRE_SECONDS = 300
 
@@ -971,7 +971,22 @@ def facebook_login():
     return redirect(
         url_for("guest_login")
     )
+# =========================================================
+# GOOGLE
+# =========================================================
+# Đây là route chờ tích hợp Google OAuth thật.
+# =========================================================
 
+@app.route("/auth/google")
+def google_login():
+
+    flash(
+        "Google Login cần cấu hình Google OAuth Client ID và Client Secret."
+    )
+
+    return redirect(
+        url_for("guest_login")
+    )
 
 # =========================================================
 # ADMIN LOGOUT
@@ -1554,4 +1569,4 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=5000
     )
-```
+
